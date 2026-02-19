@@ -1,12 +1,9 @@
-# Using lambda with sorted()
-
 students = [
     ("Ali", 85),
     ("Dana", 92),
     ("Aruzhan", 78)
 ]
 
-# Sort by score
 sorted_students = sorted(students, key=lambda x: x[1])
 
 print(sorted_students)
