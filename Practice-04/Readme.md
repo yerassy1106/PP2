@@ -1,8 +1,8 @@
-Practice 4 – Python Advanced Topics
+🚀 Practice 4 – Python Advanced Topics
 
-This repository contains solutions for Practice 4.
+This repository contains solutions for Practice 4 in Python Programming 2.
 
-Topics Covered
+📚 Topics Covered
 
 Python Iterators
 
@@ -16,15 +16,15 @@ Random Module
 
 JSON Parsing and Creation
 
-Repository Structure
+📁 Repository Structure
 Your-Repository/
+│
 ├── generators.py
 ├── dates.py
 ├── math.py
 ├── json.py
 └── README.md
 📌 generators.py
-
 Contains:
 
 Generator that produces squares up to N
@@ -37,7 +37,7 @@ Generator for squares in range (a, b)
 
 Countdown generator from n to 0
 
-Concepts used:
+Concepts Used:
 
 yield
 
@@ -48,7 +48,6 @@ Generator expressions
 Loop iteration
 
 📌 dates.py
-
 Contains:
 
 Subtract 5 days from current date
@@ -59,7 +58,7 @@ Remove microseconds from datetime
 
 Calculate difference between two dates in seconds
 
-Concepts used:
+Concepts Used:
 
 datetime.now()
 
@@ -70,7 +69,6 @@ timedelta
 .total_seconds()
 
 📌 math.py
-
 Contains:
 
 Degree to radian conversion
@@ -81,7 +79,7 @@ Area of regular polygon
 
 Area of parallelogram
 
-Concepts used:
+Concepts Used:
 
 math.pi
 
@@ -89,10 +87,9 @@ math.tan()
 
 Mathematical formulas
 
-Basic arithmetic operations
+Arithmetic operations
 
 📌 json.py
-
 Contains:
 
 Reading JSON file (sample-data.json)
@@ -105,7 +102,7 @@ Filtering data
 
 Writing JSON data using json.dump()
 
-Concepts used:
+Concepts Used:
 
 JSON syntax
 
@@ -115,7 +112,7 @@ File handling
 
 Data filtering
 
-How to Run
+▶ How to Run
 
 Run each file separately:
 
@@ -123,11 +120,11 @@ python generators.py
 python dates.py
 python math.py
 python json.py
-Commit Instructions
+💾 Commit Instructions
 git add .
 git commit -m "Add Practice4 - Python iterators, generators, dates, math, and JSON"
 git push origin main
-Author
+👨‍🎓 Author
 
 Student Name: Ibragimov Yerassyl
 Course: Python Programming 2
