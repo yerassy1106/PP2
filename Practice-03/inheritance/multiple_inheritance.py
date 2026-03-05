@@ -1,13 +1,14 @@
 class Father:
-    def skills(self):
+    def skills1(self):
         print("Programming")
 
 class Mother:
-    def skills(self):
+    def skills2(self):
         print("Design")
 
 class Child(Father, Mother):
     pass
 
 child = Child()
-child.skills()  
+child.skills1()
+child.skills2()  
