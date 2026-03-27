@@ -1,15 +1,14 @@
-import shutil
+# Remove the file "demofile.txt":
 import os
+os.remove("demofile.txt") 
 
-source = "sample.txt"
-destination = "sample_backup.txt"
+# Check if file exists, then delete it:
+import os
+if os.path.exists("demofile.txt"):
+  os.remove("demofile.txt")
+else:
+  print("The file does not exist") 
 
-# Копирование
-if os.path.exists(source):
-    shutil.copy(source, destination)
-    print(f"backup created: {destination}")
-
-# Удаление (будь осторожен!)
-if os.path.exists("temp.txt"):
-    os.remove("temp.txt")
-    print("Temporary file deleted.")
+# Remove the folder "myfolder":
+import os
+os.rmdir("myfolder") 

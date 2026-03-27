@@ -1,9 +1,25 @@
-file_path = "output.txt"
+# "x" - Create - will create a file, returns an error if the file exists
 
-# Режим 'w' (Write) — Полная перезапись. Если файл был, он удалится и создастся заново.
-with open(file_path, "w") as f:
-    f.write("Initial content.\n")
+# "a" - Append - will create a file if the specified file does not exists
 
-# Режим 'a' (Append) — Дозапись. Новые данные добавятся в конец, старые останутся.
-with open(file_path, "a") as f:
-    f.write("Added a new line.\n") # Используем .write(), а не .append()
+# "w" - Write - will create a file if the specified file does not exists
+
+with open("demofile.txt", "a") as f:
+  f.write("Now the file has more content!")
+f.close()
+
+#open and read the file after the appending:
+with open("demofile.txt") as f:
+  print(f.read()) 
+f.close()
+with open("demofile.txt", "w") as f:
+  f.write("Woops! I have deleted the content!")
+f.close()
+
+#open and read the file after the overwriting:
+with open("demofile.txt") as f:
+  print(f.read()) 
+f.close()
+
+#Create a new file called "myfile.txt":
+f = open("myfile.txt", "x") 
