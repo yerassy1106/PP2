@@ -1,125 +1,133 @@
+# phonebook.py
+import csv
+import psycopg2
 from connect import get_connection
 
+def create_table():
+    """Создает таблицу при запуске, если её нет."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS phonebook (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(255) UNIQUE NOT NULL,
+            phone VARCHAR(20) NOT NULL
+        );
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def sync_to_csv():
+    """Сохраняет актуальное состояние базы в файл contacts.csv."""
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT username, phone FROM phonebook ORDER BY id;")
+        rows = cur.fetchall()
+        with open('contacts.csv', 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerows(rows)
+    except Exception as e:
+        print(f"Ошибка синхронизации с CSV: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
 def insert_contact(username, phone):
+    """Добавляет или обновляет контакт и синхронизирует CSV."""
     conn = get_connection()
     cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO phonebook (username, phone) 
+            VALUES (%s, %s) 
+            ON CONFLICT (username) 
+            DO UPDATE SET phone = EXCLUDED.phone;
+        """, (username.strip(), phone.strip()))
+        conn.commit()
+        print(f"Контакт '{username}' сохранен.")
+        sync_to_csv() # Обновляем файл
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
 
-    cur.execute(
-        "INSERT INTO phonebook (username, phone) VALUES (%s, %s) ON CONFLICT (username) DO NOTHING",
-        (username, phone)
-    )
+def import_from_csv(filename):
+    """Загружает данные из CSV в базу данных."""
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        with open(filename.strip(), newline='', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            count = 0
+            for row in reader:
+                if len(row) < 2: continue
+                name, phone = row[0].strip(), row[1].strip()
+                if not name or name.lower() == "username": continue
+                
+                cur.execute("""
+                    INSERT INTO phonebook (username, phone) 
+                    VALUES (%s, %s) 
+                    ON CONFLICT (username) 
+                    DO UPDATE SET phone = EXCLUDED.phone;
+                """, (name, phone))
+                count += 1
+        conn.commit()
+        print(f"Импорт завершен. Обработано строк: {count}")
+    except FileNotFoundError:
+        print(f"Файл '{filename}' не найден.")
+    finally:
+        cur.close()
+        conn.close()
 
+def delete_contact(val, by_phone=False):
+    """Удаляет контакт и синхронизирует CSV."""
+    conn = get_connection()
+    cur = conn.cursor()
+    sql = "DELETE FROM phonebook WHERE phone=%s" if by_phone else "DELETE FROM phonebook WHERE username=%s"
+    cur.execute(sql, (val,))
     conn.commit()
+    print("Контакт удален.")
+    sync_to_csv() # Обновляем файл
     cur.close()
     conn.close()
 
-def search_by_name(name):
+def show_all_contacts():
+    """Выводит список из базы."""
     conn = get_connection()
     cur = conn.cursor()
-
-    cur.execute("SELECT * FROM phonebook WHERE username ILIKE %s", (f"%{name}%",))
+    cur.execute("SELECT id, username, phone FROM phonebook ORDER BY id;")
     rows = cur.fetchall()
-
-    for row in rows:
-        print(row)
-
-    cur.close()
-    conn.close()
-
-def search_by_phone_prefix(prefix):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM phonebook WHERE phone LIKE %s", (prefix + "%",))
-    rows = cur.fetchall()
-
-    for row in rows:
-        print(row)
-
-    cur.close()
-    conn.close()
-
-def update_contact(username, new_name=None, new_phone=None):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    if new_name:
-        cur.execute(
-            "UPDATE phonebook SET username=%s WHERE username=%s",
-            (new_name, username)
-        )
-
-    if new_phone:
-        cur.execute(
-            "UPDATE phonebook SET phone=%s WHERE username=%s",
-            (new_phone, username)
-        )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-def delete_contact_by_name(username):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("DELETE FROM phonebook WHERE username=%s", (username,))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-def delete_contact_by_phone(phone):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("DELETE FROM phonebook WHERE phone=%s", (phone,))
-
-    conn.commit()
+    if not rows:
+        print("\n[!] База пуста.")
+    else:
+        print("\n--- ТЕКУЩИЕ КОНТАКТЫ ---")
+        for row in rows:
+            print(f"ID: {row[0]} | Имя: {row[1]} | Тел: {row[2]}")
     cur.close()
     conn.close()
 
 def menu():
+    create_table()
     while True:
-        print("\n1. Add contact")
-        print("2. Import CSV")
-        print("3. Search by name")
-        print("4. Search by phone prefix")
-        print("5. Update contact")
-        print("6. Delete contact")
-        print("7. Exit")
-
-        choice = input("Choose: ")
+        print("\n1. Добавить/Обновить | 2. Импорт из CSV | 6. Удалить | 7. Показать все | 0. Выход")
+        choice = input("Выберите действие: ")
 
         if choice == "1":
-            name = input("Name: ")
-            phone = input("Phone: ")
-            insert_contact(name, phone)
-
+            insert_contact(input("Имя: "), input("Телефон: "))
         elif choice == "2":
-            file = input("CSV filename: ")
-            import_from_csv(file)
-
-        elif choice == "3":
-            name = input("Search name: ")
-            search_by_name(name)
-
-        elif choice == "4":
-            prefix = input("Phone prefix: ")
-            search_by_phone_prefix(prefix)
-
-        elif choice == "5":
-            name = input("Current name: ")
-            new_name = input("New name (or Enter): ")
-            new_phone = input("New phone (or Enter): ")
-            update_contact(name, new_name or None, new_phone or None)
-
+            import_from_csv(input("Имя CSV файла (contacts.csv): "))
         elif choice == "6":
-            name = input("Delete by name: ")
-            delete_contact_by_name(name)
-
+            val = input("Введите имя или телефон для удаления: ")
+            mode = input("1 - по имени, 2 - по телефону: ")
+            delete_contact(val, by_phone=(mode == "2"))
         elif choice == "7":
-            break 
+            show_all_contacts()
+        elif choice == "0":
+            break
 
 if __name__ == "__main__":
     menu()

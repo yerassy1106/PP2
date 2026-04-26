@@ -73,16 +73,16 @@ def call_delete(target):
 if __name__ == "__main__":
     # --- ТЕСТЫ ---
     # 1. Одиночный Upsert
-    call_upsert("Yersultan", "87015554433")
+    call_upsert("Adilkhan", "87015554773")
 
     # 2. Массовая вставка (один номер правильный, другой короткий - для теста)
-    call_bulk_insert(["Miras", "Temir"], ["87021112233", "123"]) 
+    call_bulk_insert(["Sara", "John"], ["87021112233", "abc"]) 
 
     # 3. Поиск
-    search_contacts("Yer")
+    search_contacts("l")
 
     # 4. Пагинация
-    get_paginated(2, 0)
+    get_paginated(100, 0)
 
     # 5. Удаление
     # call_delete("Miras")

@@ -1,19 +1,3 @@
-import csv
-from connect import get_connection
-
-def import_from_csv(filename):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    with open(filename, newline='', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            username, phone = row
-            cur.execute(
-                "INSERT INTO phonebook (username, phone) VALUES (%s, %s) ON CONFLICT DO NOTHING",
-                (username, phone)
-            )
-
-    conn.commit()
-    cur.close()
-    conn.close()
+Ivan Ivanov, 87071112233
+Alina Malikova, 87475556677
+John Doe, 7677554477
